@@ -25,16 +25,17 @@ func (s *Service) HandleRequest(process func(), u *User) bool {
 		done <- true
 	}()
 
-	for {
-		select {
-		case <-done:
-			return true
-		case <-time.After(time.Second * time.Duration(s.AllowedSecondsToProcess)):
-			if !u.IsPremium {
-				return false
-			}
+	success := true
+	select {
+	case <-done:
+		return success
+	case <-time.After(time.Second * time.Duration(s.AllowedSecondsToProcess)):
+		if !u.IsPremium {
+			return false
 		}
 	}
+
+	return success
 }
 
 func sampleProcess(seconds int64) {
